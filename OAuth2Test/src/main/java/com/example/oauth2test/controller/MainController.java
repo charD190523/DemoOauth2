@@ -32,27 +32,22 @@ public class MainController {
 
     @GetMapping("/profile")
     public String profile(Model model) {
-        // Lấy thông tin người dùng từ SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         OAuth2User user = (OAuth2User) authentication.getPrincipal();
 
-        // Thêm thông tin vào Model
         model.addAttribute("name", user.getAttribute("name"));
         model.addAttribute("email", user.getAttribute("email"));
         model.addAttribute("picture", user.getAttribute("picture"));
 
-        return "userprofile"; // Trả về view userprofile.html
+        return "userprofile";
     }
 
     @GetMapping("/oauth2/success")
     public String success(Authentication authentication) {
-        // Lấy OAuth2User từ Authentication
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
 
-        // Lấy thông tin từ OAuth2User
         String email = oauth2User.getAttribute("email");
 
-        // Tìm User trong cơ sở dữ liệu
         User user = userService.findByEmail(email);
         if (user == null) {
             return "User not found";
@@ -62,7 +57,6 @@ public class MainController {
         CustomUserDetails userDetails = new CustomUserDetails(user);
         String jwt = jwtProvider.generateToken(userDetails);
         System.out.println("JWT: " + jwt);
-        // Trả về cả Access Token của Google và JWT của hệ thống
         return "redirect:/profile";
     }
 
